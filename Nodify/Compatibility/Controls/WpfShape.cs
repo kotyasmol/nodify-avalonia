@@ -73,15 +73,24 @@ public class WpfShape : Panel
         _shape?.InvalidateGeometry();
         InvalidateMeasure();
         InvalidateVisual();
+        OnGeometryInvalidated();
     }
+
+    /// <summary>Called when the shape's geometry needs to be rebuilt.</summary>
+    protected virtual void OnGeometryInvalidated() { }
 
     private void OnShapeGeometryChanged()
     {
         _hitGeometry = null;
         InvalidateMeasure();
         InvalidateVisual();
+        OnGeometryInvalidated();
     }
 
+    /// <summary>Gets the cached geometry before applying the stretch transform.</summary>
+    protected Geometry? DefiningGeometry => _shape?.DefiningGeometry;
+
+    /// <summary>Gets the shape's cached geometry, including its stretch transform.</summary>
     protected Geometry? RenderedGeometry => _shape?.RenderedGeometry;
 
     internal Geometry? GetHitGeometry()
@@ -121,6 +130,10 @@ public class WpfShape : Panel
         }
     }
 
+    internal void SetRenderVisible(bool visible)
+    {
+        _renderer!.IsVisible = visible;
+    }
     
     private Geometry? OnCreateDefiningGeometry() => CreateDefiningGeometry();
 

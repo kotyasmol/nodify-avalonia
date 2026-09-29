@@ -87,6 +87,9 @@ Avalonia version compatibility chart:
 See [connection interactions](docs/Connection-Interactions.md) for cutting with
 Alt+Shift+drag, hover outlines and connection layering.
 
+See [viewport caching](docs/Viewport-Caching.md) for the experimental Avalonia 12
+node caches and offscreen connection rendering options.
+
 ## 📝 Documentation
 
 For the wiki please refer to the original [miroiu's Wiki](https://github.com/miroiu/nodify/wiki) since the API is identical, but please report bugs here. However, if you find a bug, please try to check if it also occurs in the original WPF's version.

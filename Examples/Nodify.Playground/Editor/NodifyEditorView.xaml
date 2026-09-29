@@ -287,6 +287,8 @@
                              AutoPanEdgeDistance="{Binding AutoPanningEdgeDistance, Source={x:Static local:EditorSettings.Instance}}"
                              GridCellSize="{Binding GridSpacing, Source={x:Static local:EditorSettings.Instance}}"
                              EnableRealtimeSelection="{Binding EnableRealtimeSelection, Source={x:Static local:EditorSettings.Instance}}"
+                             EnableNodeCaching="{Binding EnableNodeCaching, Source={x:Static local:EditorSettings.Instance}}"
+                             EnableConnectionCulling="{Binding EnableConnectionCulling, Source={x:Static local:EditorSettings.Instance}}"
                              DisableAutoPanning="{Binding DisableAutoPanning, Source={x:Static local:EditorSettings.Instance}}"
                              DisablePanning="{Binding DisablePanning, Source={x:Static local:EditorSettings.Instance}}"
                              DisableZooming="{Binding DisableZooming, Source={x:Static local:EditorSettings.Instance}}"
@@ -603,11 +605,6 @@
                             Value="{Binding SelectableNodes, Source={x:Static local:EditorSettings.Instance}}" />
                     <Setter Property="IsDraggable"
                             Value="{Binding DraggableNodes, Source={x:Static local:EditorSettings.Instance}}" />                            
-                    <!-- <Setter Property="CacheMode"> -->
-                    <!--     <Setter.Value> -->
-                    <!--         <BitmapCache RenderAtScale="{Binding MaxZoom, Source={x:Static local:EditorSettings.Instance}}" EnableClearType="True" /> -->
-                    <!--     </Setter.Value> -->
-                    <!-- </Setter> -->
                     <Setter Property="Location"
                             Value="{Binding Location}" />
                     <Setter Property="(Interaction.Behaviors)">
