@@ -11,6 +11,41 @@ public partial class NodifyEditor
         base.OnPropertyChanged(change);
         if (change.Property == DisplayConnectionsOnTopProperty)
             PseudoClasses.Set(":connections-on-top", DisplayConnectionsOnTop);
+        if (change.Property == EnableNodeCachingProperty || change.Property == NodeCacheMaxPixelsProperty)
+            ApplyRenderingOptimizations();
+        if (change.Property == EnableConnectionCullingProperty || change.Property == ViewportLocationProperty ||
+            change.Property == ViewportSizeProperty || change.Property == ViewportZoomProperty)
+            InvalidateConnectionViewport(change.Property == EnableConnectionCullingProperty);
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        OnSelectedItemsSourceChanged(null!, SelectedItems!);
+        OnDisableAutoPanningChanged(DisableAutoPanning);
+        InvalidateConnectionViewport();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        OnDisableAutoPanningChanged(true);
+        if (SelectedItems is System.Collections.Specialized.INotifyCollectionChanged selected)
+            selected.CollectionChanged -= OnSelectedItemsChanged;
+        bringToViewToken?.Cancel();
+        bringToViewToken?.Dispose();
+        bringToViewToken = null;
+        CancelActiveCutting();
+        PopAllStates();
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void CancelActiveCutting()
+    {
+        foreach (var state in _states)
+        {
+            if (state is EditorCuttingState cutting)
+                cutting.Canceled = true;
+        }
     }
 
     private bool inOnSelectedItemsChanged;

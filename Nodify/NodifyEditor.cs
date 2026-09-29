@@ -283,20 +283,9 @@ namespace Nodify
 
         private void ApplyRenderingOptimizations()
         {
-            if (ItemsHost != null)
-            {
-                if (EnableRenderingContainersOptimizations && Items.Count >= OptimizeRenderingMinimumContainers)
-                {
-                    double zoom = ViewportZoom;
-                    double availableZoomIn = 1.0 - MinViewportZoom;
-                    bool shouldCache = zoom / availableZoomIn <= OptimizeRenderingZoomOutPercent;
-                    //ItemsHost.CacheMode = shouldCache ? new BitmapCache(1.0 / zoom) : null;
-                }
-                else
-                {
-                    //ItemsHost.CacheMode = null;
-                }
-            }
+            IEnumerable<ItemContainer> containers = ShouldCacheNodes ? _renderingContainers : _cachedContainers.ToArray();
+            foreach (var container in containers)
+                container.UpdateBitmapCache();
         }
 
         #endregion
@@ -1173,18 +1162,19 @@ namespace Nodify
         /// <param name="shouldDisable">Whether to enable or disable auto panning.</param>
         protected virtual void OnDisableAutoPanningChanged(bool shouldDisable)
         {
-            if (shouldDisable)
+            if (_autoPanningTimer != null)
             {
-                _autoPanningTimer?.Stop();
+                _autoPanningTimer.Stop();
+                _autoPanningTimer.Tick -= HandleAutoPanning;
+                _autoPanningTimer = null;
             }
-            else if (_autoPanningTimer == null)
+            if (!shouldDisable && !DisablePanning && TopLevel.GetTopLevel(this) != null && ItemsHost != null)
             {
-                _autoPanningTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(AutoPanningTickRate),
-                    DispatcherPriority.Background, HandleAutoPanning);
-            }
-            else
-            {
-                _autoPanningTimer.Interval = TimeSpan.FromMilliseconds(AutoPanningTickRate);
+                _autoPanningTimer = new DispatcherTimer(DispatcherPriority.Background)
+                {
+                    Interval = TimeSpan.FromMilliseconds(AutoPanningTickRate)
+                };
+                _autoPanningTimer.Tick += HandleAutoPanning;
                 _autoPanningTimer.Start();
             }
         }
@@ -1354,7 +1344,10 @@ namespace Nodify
 
         /// <inheritdoc />
         protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
-            => PopAllStates();
+        {
+            CancelActiveCutting();
+            PopAllStates();
+        }
 
         /// <inheritdoc />
         protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
@@ -1393,8 +1386,9 @@ namespace Nodify
                 oc.CollectionChanged -= OnSelectedItemsChanged;
             }
 
-            if (newValue is INotifyCollectionChanged nc)
+            if (TopLevel.GetTopLevel(this) != null && newValue is INotifyCollectionChanged nc)
             {
+                nc.CollectionChanged -= OnSelectedItemsChanged;
                 nc.CollectionChanged += OnSelectedItemsChanged;
             }
 

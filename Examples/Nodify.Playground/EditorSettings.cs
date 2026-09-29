@@ -26,6 +26,16 @@ namespace Nodify.Playground
             _settings = new List<ISettingViewModel>()
             {
                 new ProxySettingViewModel<bool>(
+                    () => Instance.EnableNodeCaching,
+                    val => Instance.EnableNodeCaching = val,
+                    "Cache visible nodes: ",
+                    "Render complex nodes to bitmaps while their content is unchanged."),
+                new ProxySettingViewModel<bool>(
+                    () => Instance.EnableConnectionCulling,
+                    val => Instance.EnableConnectionCulling = val,
+                    "Cull offscreen connections: ",
+                    "Skip drawing and arrow animations outside the viewport."),
+                new ProxySettingViewModel<bool>(
                     () => Instance.EnableRealtimeSelection,
                     val => Instance.EnableRealtimeSelection = val,
                     "Realtime selection: ",
@@ -293,6 +303,20 @@ namespace Nodify.Playground
             };
 
             EnableCuttingLinePreview = true;
+        }
+
+        private bool _enableNodeCaching;
+        public bool EnableNodeCaching
+        {
+            get => _enableNodeCaching;
+            set => SetProperty(ref _enableNodeCaching, value);
+        }
+
+        private bool _enableConnectionCulling;
+        public bool EnableConnectionCulling
+        {
+            get => _enableConnectionCulling;
+            set => SetProperty(ref _enableConnectionCulling, value);
         }
 
         private void OnSearchTextChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

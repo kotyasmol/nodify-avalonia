@@ -756,15 +756,15 @@ namespace Nodify
         /// <param name="duration">The duration for moving an arrowhead from <see cref="Source"/> to <see cref="Target"/>.</param>
         public void StartAnimation(double duration = 1.5d)
         {
-            StopAnimation();
-            animationTokenSource = new();
-            this.StartLoopingAnimation(DirectionalArrowsOffsetProperty, DirectionalArrowsOffset + 1d, duration, animationTokenSource.Token);
+            _animationDuration = duration;
+            UpdateAnimation();
         }
 
         /// <summary>Stops the animation started by <see cref="StartAnimation(double)"/></summary>
         public void StopAnimation()
         {
-            this.CancelAnimation(DirectionalArrowsOffsetProperty, animationTokenSource);
+            _animationDuration = null;
+            PauseAnimation();
         }
 
         protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -832,6 +832,7 @@ namespace Nodify
                 e.Pointer.Capture(null);
                 this.PropagateMouseCapturedWithin(false);
             }
+            base.OnPointerReleased(e);
         }
         
         private Pen GetOutlinePen()
@@ -841,17 +842,16 @@ namespace Nodify
 
         protected override void Render(DrawingContext drawingContext)
         {
-            if (OutlineBrush != null)
+            if (OutlineBrush != null && RenderedGeometry is { } geometry)
             {
-                drawingContext.DrawGeometry(OutlineBrush, GetOutlinePen(), CreateDefiningGeometry());
+                drawingContext.DrawGeometry(OutlineBrush, GetOutlinePen(), geometry);
             }
 
             base.Render(drawingContext);
         
             if (!string.IsNullOrEmpty(Text))
             {
-                var typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
-                var text = new FormattedText(Text, CultureInfo.CurrentUICulture, FlowDirection, typeface, FontSize, Foreground ?? Stroke);
+                var text = GetFormattedText();
 
                 (Vector sourceOffset, Vector targetOffset) = GetOffset();
                 drawingContext.DrawText(text, GetTextPosition(text, Source + sourceOffset, Target + targetOffset));

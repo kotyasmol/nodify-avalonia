@@ -181,10 +181,10 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Style Selector="^ /template/ local|ConnectionsMultiSelector#PART_ConnectionsHost">
+        <Style Selector="^ /template/ ItemsControl#PART_ConnectionsHost">
             <Setter Property="ZIndex" Value="-1" />
         </Style>
-        <Style Selector="^:connections-on-top /template/ local|ConnectionsMultiSelector#PART_ConnectionsHost">
+        <Style Selector="^:connections-on-top /template/ ItemsControl#PART_ConnectionsHost">
             <Setter Property="ZIndex" Value="0" />
         </Style>
         <!-- TODO: Avalonia does not support MultiTrigger. Cursor changes for pushing items are not yet ported. -->
