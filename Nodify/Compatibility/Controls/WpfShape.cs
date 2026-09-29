@@ -93,7 +93,7 @@ public class WpfShape : Panel
     internal Geometry? GetHitGeometry()
     {
         // Dash collections can change without replacing the property value.
-        if (StrokeDashArray is { Count: > 0 })
+        if (StrokeDashArray != null)
             _hitGeometry = null;
         if (_hitGeometry == null && RenderedGeometry is { } geometry)
         {

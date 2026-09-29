@@ -24,6 +24,27 @@ public class CuttingTests
     }
 
     [AvaloniaFact]
+    public void ClearingDashArrayRefreshesCutGeometry()
+    {
+        var connection = new LineConnection
+        {
+            Source = new Point(100, 100), Target = new Point(400, 100), Spacing = 0,
+            SourceOffsetMode = ConnectionOffsetMode.None, TargetOffsetMode = ConnectionOffsetMode.None,
+            ArrowEnds = ArrowHeadEnds.None, Fill = null, StrokeThickness = 2,
+            StrokeDashArray = [5, 5]
+        };
+        int removed = 0;
+        connection.Disconnect += (_, _) => removed++;
+        using var view = new EditorView(connection);
+        view.Editor.Cut(new Point(115, 50), new Point(115, 150));
+        Assert.Equal(0, removed);
+
+        connection.StrokeDashArray.Clear();
+        view.Editor.Cut(new Point(115, 50), new Point(115, 150));
+        Assert.Equal(1, removed);
+    }
+
+    [AvaloniaFact]
     public void CutUsesCurveGeometryInsteadOfBoundingBox()
     {
         var curve = new Connection { Source = new Point(100, 100), Target = new Point(400, 300), Spacing = 0 };
