@@ -283,20 +283,9 @@ namespace Nodify
 
         private void ApplyRenderingOptimizations()
         {
-            if (ItemsHost != null)
-            {
-                if (EnableRenderingContainersOptimizations && Items.Count >= OptimizeRenderingMinimumContainers)
-                {
-                    double zoom = ViewportZoom;
-                    double availableZoomIn = 1.0 - MinViewportZoom;
-                    bool shouldCache = zoom / availableZoomIn <= OptimizeRenderingZoomOutPercent;
-                    //ItemsHost.CacheMode = shouldCache ? new BitmapCache(1.0 / zoom) : null;
-                }
-                else
-                {
-                    //ItemsHost.CacheMode = null;
-                }
-            }
+            IEnumerable<ItemContainer> containers = ShouldCacheNodes ? _renderingContainers : _cachedContainers.ToArray();
+            foreach (var container in containers)
+                container.UpdateBitmapCache();
         }
 
         #endregion
