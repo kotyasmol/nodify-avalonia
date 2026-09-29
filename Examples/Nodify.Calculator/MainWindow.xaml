@@ -49,7 +49,7 @@
                     <Setter Property="Header" 
                             Value="{Binding Name}"/>
                     <Setter Property="CloseTabCommand" 
-                            Value="{Binding DataContext.CloseEditorCommand ,Source={StaticResource Proxy}}"/>
+                            Value="{Binding ((local:ApplicationViewModel)DataContext).CloseEditorCommand ,Source={StaticResource Proxy}}"/>
                     <Setter Property="CloseTabCommandParameter" 
                             Value="{Binding Id}"/>
                 </ControlTheme>

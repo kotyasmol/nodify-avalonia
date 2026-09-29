@@ -35,7 +35,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type local:OperationInfoViewModel}">
                         <Button Content="{Binding Title}"
-                                Command="{Binding DataContext.CreateOperationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                Command="{Binding ((local:OperationsMenuViewModel)DataContext).CreateOperationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding}"
                                 Background="Transparent"
                                 BorderBrush="Transparent"

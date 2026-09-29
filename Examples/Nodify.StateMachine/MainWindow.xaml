@@ -112,7 +112,7 @@
                                 </ControlTheme>
                             </nodify:LineConnection.Theme>
                             <nodify:LineConnection.ContextMenu>
-                                <ContextMenu DataContext="{Binding DataContext, Source={StaticResource EditorProxy}}">
+                                <ContextMenu x:DataType="local:StateMachineViewModel" DataContext="{ReflectionBinding DataContext, Source={StaticResource EditorProxy}}">
                                     <MenuItem Header="_Delete"
                                               Icon="{StaticResource DeleteIcon}"
                                               Command="{Binding DeleteTransitionCommand}"
@@ -163,7 +163,7 @@
                 </nodify:NodifyEditor.ItemTemplate>
 
                 <nodify:NodifyEditor.ItemContainerTheme>
-                    <ControlTheme TargetType="{x:Type nodify:ItemContainer}"
+                    <ControlTheme TargetType="{x:Type nodify:ItemContainer}" x:DataType="local:StateViewModel"
                            BasedOn="{StaticResource {x:Type nodify:ItemContainer}}">
                         <Setter Property="BorderBrush"
                                 Value="Transparent" />
@@ -173,7 +173,7 @@
                                 Value="{Binding Size, Mode=OneWayToSource}" />
                         <Setter Property="ContextMenu">
                             <Setter.Value>
-                                <ContextMenu DataContext="{Binding DataContext, Source={StaticResource EditorProxy}}">
+                                <ContextMenu x:DataType="local:StateMachineViewModel" DataContext="{ReflectionBinding DataContext, Source={StaticResource EditorProxy}}">
                                     <MenuItem Header="_Delete"
                                               Tag="{StaticResource DeleteIcon}"
                                               Command="{Binding DeleteSelectionCommand}" />
@@ -217,7 +217,7 @@
                 </nodify:NodifyEditor.ItemContainerTheme>
 
                 <nodify:NodifyEditor.ContextMenu>
-                    <ContextMenu DataContext="{Binding DataContext, Source={StaticResource EditorProxy}}">
+                    <ContextMenu x:DataType="local:StateMachineViewModel" DataContext="{ReflectionBinding DataContext, Source={StaticResource EditorProxy}}">
                         <MenuItem Header="_Add State"
                                   Tag="{StaticResource AddStateIcon}"
                                   InputGesture="Shift+A"
@@ -465,9 +465,9 @@
                                                                Margin="0 0 10 0"
                                                                VerticalAlignment="Center" />
 
-                                                    <ComboBox ItemsSource="{Binding DataContext.Blackboard.Conditions, Source={StaticResource EditorProxy}}"
+                                                    <ComboBox ItemsSource="{ReflectionBinding DataContext.Blackboard.Conditions, Source={StaticResource EditorProxy}}"
                                                               SelectedItem="{Binding ConditionReference}"
-                                                              DisplayMemberBinding="{Binding Name}"
+                                                              DisplayMemberBinding="{Binding Name, DataType={x:Type local:BlackboardItemReferenceViewModel}}"
                                                               Grid.Column="1" />
 
                                                     <!--INPUT-->
@@ -480,7 +480,7 @@
                                                                 <local:BlackboardKeyEditorView Margin="0 0 0 2">
                                                                     <local:BlackboardKeyEditorView.DataContext>
                                                                         <MultiBinding Converter="{local:BlackboardKeyEditorConverter CanChangeInputType=True}">
-                                                                            <Binding Source="{StaticResource BlackboardProxy}"
+                                                                            <ReflectionBinding Source="{StaticResource BlackboardProxy}"
                                                                                      Path="DataContext.Keys" />
                                                                             <Binding Path="DataContext" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}" />
                                                                         </MultiBinding>
@@ -587,7 +587,7 @@
                                 <ComboBox ItemsSource="{Binding Blackboard.Actions}"
                                           SelectedItem="{Binding SelectedState.ActionReference}"
                                           IsEnabled="{Binding SelectedState.IsEditable}"
-                                          DisplayMemberBinding="{Binding Name}"
+                                          DisplayMemberBinding="{Binding Name, DataType={x:Type local:BlackboardItemReferenceViewModel}}"
                                           Grid.Column="1" />
 
                                 <!--INPUT-->
@@ -626,7 +626,7 @@
                                                 <local:BlackboardKeyEditorView Margin="0 0 0 2">
                                                     <local:BlackboardKeyEditorView.DataContext>
                                                         <MultiBinding Converter="{local:BlackboardKeyEditorConverter CanChangeInputType=True}">
-                                                            <Binding Source="{StaticResource BlackboardProxy}"
+                                                            <ReflectionBinding Source="{StaticResource BlackboardProxy}"
                                                                      Path="DataContext.Keys" />
                                                             <Binding Path="DataContext" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}" /> <!-- BindsDirectlyToSource="True" -->
                                                         </MultiBinding>
@@ -671,7 +671,7 @@
                                                 <local:BlackboardKeyEditorView Margin="0 0 0 2">
                                                     <local:BlackboardKeyEditorView.DataContext>
                                                         <MultiBinding Converter="{local:BlackboardKeyEditorConverter CanChangeInputType=False}">
-                                                            <Binding Source="{StaticResource BlackboardProxy}"
+                                                            <ReflectionBinding Source="{StaticResource BlackboardProxy}"
                                                                      Path="DataContext.Keys" />
                                                             <Binding Path="DataContext" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}" /> <!-- BindsDirectlyToSource="True" -->
                                                         </MultiBinding>
@@ -737,7 +737,7 @@
                                             <local:BlackboardKeyEditorView>
                                                 <local:BlackboardKeyEditorView.DataContext>
                                                     <MultiBinding Converter="{local:BlackboardKeyEditorConverter CanChangeInputType=False}">
-                                                        <Binding Source="{StaticResource BlackboardProxy}"
+                                                        <ReflectionBinding Source="{StaticResource BlackboardProxy}"
                                                                  Path="DataContext.Keys" />
                                                         <Binding Path="DataContext" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}" /> <!-- BindsDirectlyToSource="True" -->
                                                         <Binding ElementName="EditKeyName"
@@ -753,7 +753,7 @@
                                                           ToolTip.Tip="Edit Name"
                                                           Theme="{StaticResource IconCheckBox}" />
                                                 <Button Content="{StaticResource RemoveKeyIcon}"
-                                                        Command="{Binding DataContext.Blackboard.RemoveKeyCommand, Source={StaticResource EditorProxy}}"
+                                                        Command="{ReflectionBinding DataContext.Blackboard.RemoveKeyCommand, Source={StaticResource EditorProxy}}"
                                                         CommandParameter="{Binding}"
                                                         Theme="{StaticResource IconButton}" />
                                             </StackPanel>
