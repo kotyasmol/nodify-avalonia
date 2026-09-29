@@ -82,9 +82,11 @@ Avalonia version compatibility chart:
  - Ready for undo/redo
  - Example applications: 🎨 [**Playground**](Examples/Nodify.Playground), 🌓 [**State machine**](Examples/Nodify.StateMachine), 💻 [**Calculator**](Examples/Nodify.Calculator), 🔶 [**Canvas**](Examples/Nodify.Shapes)
 
-## 😿 Unsupported Features
+## Avalonia rendering and interactions
 
- - Cutting Lines (blocker: https://github.com/AvaloniaUI/Avalonia/issues/16549)
+See [rendering large graphs](docs/Avalonia-Performance.md) for node bitmap caching,
+offscreen connection culling, performance measurements and connection cutting
+with Alt+Shift+drag.
 
 ## 📝 Documentation
 
