@@ -123,9 +123,6 @@ namespace Nodify
                 PanHorizontalModifierKey = ModifierKeys.Shift;
                 PanVerticalModifierKey = ModifierKeys.None;
 
-                // Avalonia doesn't support Geometry Hit Testing, so Cutting can't work, hence disable it
-                // Follow https://github.com/AvaloniaUI/Avalonia/issues/16549 for more information
-                Cutting = new KeyGesture(Key.None);
             }
 
             /// <summary>Gesture used to start selecting using a <see cref="SelectionGestures"/> strategy.</summary>

@@ -3,12 +3,13 @@ namespace Nodify.Compatibility;
 /// <summary>
 /// Nodify wants to override Render method in Shape, but this is not legal in Avalonia.
 /// This control is a workaround to allow overriding Render method in a Shape.
-/// It contains two inner controls: actual shape and actual renderer.
+/// A Shape supplies layout and cached geometry; a single visual renders the connection.
 /// </summary>
 public class WpfShape : Panel
 {
     private InnerShape? _shape;
     private InnerRenderer? _renderer;
+    private Geometry? _hitGeometry;
 
     public static readonly StyledProperty<IBrush?> FillProperty = Shape.FillProperty.AddOwner<WpfShape>();
 
@@ -58,20 +59,68 @@ public class WpfShape : Panel
         _shape.Bind(StrokeLineCapProperty, this.GetObservable(StrokeLineCapProperty), BindingPriority.Template);
         _shape.Bind(StrokeJoinProperty, this.GetObservable(StrokeJoinProperty), BindingPriority.Template);
         _renderer = new InnerRenderer();
-        Children.Add(_shape);
+        foreach (var property in InnerRenderer.PaintProperties)
+            _renderer.Bind(property, this.GetObservable(property), BindingPriority.Template);
         Children.Add(_renderer);
         _renderer.OnRender += OnRender;
         _shape.OnCreateDefiningGeometry += OnCreateDefiningGeometry;
+        _shape.GeometryChanged += OnShapeGeometryChanged;
     }
-
-    /// <summary>Gets the shape's cached geometry, including its stretch transform.</summary>
-    protected Geometry? RenderedGeometry => _shape?.RenderedGeometry;
 
     private void InvalidateGeometry()
     {
+        _hitGeometry = null;
         _shape?.InvalidateGeometry();
+        InvalidateMeasure();
         InvalidateVisual();
     }
+
+    private void OnShapeGeometryChanged()
+    {
+        _hitGeometry = null;
+        InvalidateMeasure();
+        InvalidateVisual();
+    }
+
+    protected Geometry? RenderedGeometry => _shape?.RenderedGeometry;
+
+    internal Geometry? GetHitGeometry()
+    {
+        // Dash collections can change without replacing the property value.
+        if (StrokeDashArray != null)
+            _hitGeometry = null;
+        if (_hitGeometry == null && RenderedGeometry is { } geometry)
+        {
+            var group = new GeometryGroup { FillRule = FillRule.NonZero };
+            if (Fill != null)
+                group.Children.Add(geometry);
+            if (Stroke != null && StrokeThickness > 0)
+            {
+                var pen = new Pen(Stroke, StrokeThickness,
+                    StrokeDashArray == null ? null : new DashStyle(StrokeDashArray, StrokeDashOffset),
+                    StrokeLineCap, StrokeJoin);
+                group.Children.Add(geometry.GetWidenedGeometry(pen));
+            }
+            _hitGeometry = group;
+        }
+        return _hitGeometry;
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == StrokeProperty || change.Property == FillProperty ||
+            change.Property == StrokeThicknessProperty || change.Property == StrokeDashArrayProperty ||
+            change.Property == StrokeDashOffsetProperty || change.Property == StrokeLineCapProperty ||
+            change.Property == StrokeJoinProperty || change.Property == StretchProperty || change.Property == BoundsProperty)
+            _hitGeometry = null;
+        if (change.Property == StretchProperty || change.Property == StrokeThicknessProperty || change.Property == StrokeProperty)
+        {
+            InvalidateMeasure();
+            InvalidateVisual();
+        }
+    }
+
     
     private Geometry? OnCreateDefiningGeometry() => CreateDefiningGeometry();
 
@@ -81,7 +130,21 @@ public class WpfShape : Panel
 
     protected virtual Geometry? CreateDefiningGeometry() => null;
 
-    protected new virtual void Render(DrawingContext drawingContext) { }
+    protected new virtual void Render(DrawingContext drawingContext) => _shape?.Render(drawingContext);
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        _shape!.Measure(availableSize);
+        _renderer!.Measure(availableSize);
+        return _shape.DesiredSize;
+    }
+
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        _shape!.Arrange(new Rect(finalSize));
+        _renderer!.Arrange(new Rect(finalSize));
+        return finalSize;
+    }
     
     /// <summary>
     /// Gets or sets the <see cref="T:Avalonia.Media.IBrush" /> that specifies how the shape's interior is painted.
@@ -156,6 +219,13 @@ public class WpfShape : Panel
     private class InnerShape : Shape
     {
         public event Func<Geometry?>? OnCreateDefiningGeometry;
+        public event Action? GeometryChanged;
+
+        protected override void OnGeometryChanged(object? sender, EventArgs e)
+        {
+            base.OnGeometryChanged(sender, e);
+            GeometryChanged?.Invoke();
+        }
     
         protected override Geometry? CreateDefiningGeometry()
         {
@@ -170,6 +240,20 @@ public class WpfShape : Panel
 
     private class InnerRenderer : Control
     {
+        public static readonly AvaloniaProperty[] PaintProperties;
+
+        static InnerRenderer()
+        {
+            PaintProperties = new AvaloniaProperty[]
+            {
+                FillProperty.AddOwner<InnerRenderer>(), StrokeProperty.AddOwner<InnerRenderer>(),
+                StrokeThicknessProperty.AddOwner<InnerRenderer>(), StrokeDashArrayProperty.AddOwner<InnerRenderer>(),
+                StrokeDashOffsetProperty.AddOwner<InnerRenderer>(), StrokeLineCapProperty.AddOwner<InnerRenderer>(),
+                StrokeJoinProperty.AddOwner<InnerRenderer>()
+            };
+            Visual.AffectsRender<InnerRenderer>(PaintProperties);
+        }
+
         public event Action<DrawingContext>? OnRender;
     
         public override void Render(DrawingContext context)

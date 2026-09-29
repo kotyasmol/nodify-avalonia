@@ -31,7 +31,6 @@ namespace Nodify
         {
             ResetConnectionStyle();
 
-            // TODO: This is not canceled on LostMouseCapture (add OnLostMouseCapture/OnCancel callback?)
             if (Canceled)
             {
                 Editor.CancelCutting();
@@ -85,6 +84,7 @@ namespace Nodify
                 {
                     CuttingLine.SetIsOverElement(connection, false);
                 }
+                _previousConnections = null;
             }
         }
 
