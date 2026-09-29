@@ -37,7 +37,7 @@
         <DataTemplate x:Key="KeyTemplate"
                       DataType="{x:Type local:BlackboardKeyEditorViewModel}">
             <ComboBox SelectedItem="{Binding Target.Value}"
-                      DisplayMemberBinding="{Binding Name}">
+                      DisplayMemberBinding="{Binding Name, DataType={x:Type local:BlackboardKeyViewModel}}">
                 <ComboBox.ItemsSource>
                     <MultiBinding Converter="{local:FilterBlackboardKeysConverter}">
                         <Binding Path="AvailableKeys" />
@@ -74,8 +74,8 @@
         <ComboBox ItemsSource="{Binding Target.Type, Converter={shared:EnumValuesConverter}}"
                   IsEnabled="{Binding CanChangeKeyType}"
                   SelectedValue="{Binding Target.Type}"
-                  SelectedValueBinding="{Binding Value}"
-                  DisplayMemberBinding="{Binding Name}"
+                  SelectedValueBinding="{Binding Value, DataType={x:Type shared:EnumValue}}"
+                  DisplayMemberBinding="{Binding Name, DataType={x:Type shared:EnumValue}}"
                   Grid.Column="1"
                   Margin="0 0 5 0" />
 

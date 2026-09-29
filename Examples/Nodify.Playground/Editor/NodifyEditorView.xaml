@@ -65,6 +65,7 @@
         <!-- </Storyboard> -->
 
         <ControlTheme x:Key="ConnectionStyle"
+               x:DataType="local:ConnectionViewModel"
                TargetType="{x:Type nodify:BaseConnection}"
                BasedOn="{StaticResource {x:Type nodify:BaseConnection}}">
             <Setter Property="(nodify:BindableStyleClasses.Classes)" Value="{Binding Input.Shape}" />
@@ -336,7 +337,7 @@
             </nodify:NodifyEditor.KeyBindings>
 
             <nodify:NodifyEditor.Resources>
-                <ControlTheme TargetType="{x:Type nodify:PendingConnection}" x:Key="{x:Type nodify:PendingConnection}"
+                <ControlTheme TargetType="{x:Type nodify:PendingConnection}" x:DataType="local:PendingConnectionViewModel" x:Key="{x:Type nodify:PendingConnection}"
                        BasedOn="{StaticResource {x:Type nodify:PendingConnection}}">
                     <Setter Property="CompletedCommand"
                             Value="{Binding Graph.CreateConnectionCommand}" />
@@ -422,7 +423,7 @@
                     </Setter>
                 </ControlTheme>
 
-                <ControlTheme TargetType="{x:Type nodify:Connector}" x:Key="{x:Type nodify:Connector}"
+                <ControlTheme TargetType="{x:Type nodify:Connector}" x:DataType="local:ConnectorViewModel" x:Key="{x:Type nodify:Connector}"
                        BasedOn="{StaticResource {x:Type nodify:Connector}}">
                     <Setter Property="Anchor"
                             Value="{Binding Anchor, Mode=OneWayToSource}" />
@@ -430,7 +431,7 @@
                             Value="{Binding IsConnected}" />
                 </ControlTheme>
 
-                <ControlTheme TargetType="{x:Type nodify:NodeInput}" x:Key="{x:Type nodify:NodeInput}"
+                <ControlTheme TargetType="{x:Type nodify:NodeInput}" x:DataType="local:ConnectorViewModel" x:Key="{x:Type nodify:NodeInput}"
                        BasedOn="{StaticResource {x:Type nodify:NodeInput}}">
                     <Setter Property="(Interaction.Behaviors)">
                         <BehaviorCollectionTemplate>
@@ -493,7 +494,7 @@
                             Value="Transparent" />
                 </ControlTheme>
 
-                <ControlTheme TargetType="{x:Type nodify:NodeOutput}" x:Key="{x:Type nodify:NodeOutput}"
+                <ControlTheme TargetType="{x:Type nodify:NodeOutput}" x:DataType="local:ConnectorViewModel" x:Key="{x:Type nodify:NodeOutput}"
                        BasedOn="{StaticResource {x:Type nodify:NodeOutput}}">
                     <Setter Property="(Interaction.Behaviors)">
                         <BehaviorCollectionTemplate>
@@ -592,7 +593,7 @@
             </nodify:NodifyEditor.DataTemplates>
             
             <nodify:NodifyEditor.ItemContainerTheme>
-                <ControlTheme TargetType="{x:Type nodify:ItemContainer}"
+                <ControlTheme TargetType="{x:Type nodify:ItemContainer}" x:DataType="local:NodeViewModel"
                        BasedOn="{StaticResource {x:Type nodify:ItemContainer}}">
                     <Setter Property="BorderThickness"
                             Value="2" />
@@ -647,7 +648,7 @@
                 </DataTemplate>
             </nodify:Minimap.ItemTemplate>
             <nodify:Minimap.ItemContainerTheme>
-                <ControlTheme TargetType="{x:Type nodify:MinimapItem}"
+                <ControlTheme TargetType="{x:Type nodify:MinimapItem}" x:DataType="local:NodeViewModel"
                        BasedOn="{StaticResource {x:Type nodify:MinimapItem}}">
                     <Setter Property="Location"
                             Value="{Binding Location}" />
@@ -687,13 +688,13 @@
                                Margin="0 0 0 14"
                                Foreground="{DynamicResource Node.ForegroundBrush}">
                         <Run>From</Run>
-                        <Run Text="{Binding SelectedConnection.Output.Node.Title}"
+                        <Run Text="{ReflectionBinding SelectedConnection.Output.Node.Title}"
                              Foreground="Red" />
                         <Run> - </Run>
                         <Run Text="{Binding SelectedConnection.Output.Title}"
                              Foreground="Red" />
                         <Run>to</Run>
-                        <Run Text="{Binding SelectedConnection.Input.Node.Title}"
+                        <Run Text="{ReflectionBinding SelectedConnection.Input.Node.Title}"
                              Foreground="Red" />
                         <Run> - </Run>
                         <Run Text="{Binding SelectedConnection.Input.Title}"
@@ -729,7 +730,7 @@
                                Margin="0 0 0 14"
                                Foreground="{DynamicResource Node.ForegroundBrush}">
                         <Run>Title: </Run>
-                        <Run Text="{Binding SelectedNode.Title}"
+                        <Run Text="{ReflectionBinding SelectedNode.Title}"
                              Foreground="Red" />
                     </TextBlock>
                     <TextBlock TextWrapping="Wrap"
