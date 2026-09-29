@@ -155,9 +155,16 @@ namespace Nodify
 
         #endregion
 
+        public Connector()
+        {
+            Loaded += OnConnectorLoaded;
+            Unloaded += OnConnectorUnloaded;
+        }
+
         /// <inheritdoc />
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
+            TrySetAnchorUpdateEvents(false);
             base.OnApplyTemplate(e);
 
             Thumb = e.NameScope.Find<Control>(ElementConnector) ?? this;
@@ -165,8 +172,11 @@ namespace Nodify
             Container = this.GetParentOfType<ItemContainer>();
             Editor = Container?.Editor ?? this.GetParentOfType<NodifyEditor>();
 
-            Loaded += OnConnectorLoaded;
-            Unloaded += OnConnectorUnloaded;
+            if (IsLoaded)
+            {
+                TrySetAnchorUpdateEvents(true);
+                UpdateAnchor();
+            }
         }
 
         #region Update connector

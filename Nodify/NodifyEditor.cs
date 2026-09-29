@@ -1173,18 +1173,19 @@ namespace Nodify
         /// <param name="shouldDisable">Whether to enable or disable auto panning.</param>
         protected virtual void OnDisableAutoPanningChanged(bool shouldDisable)
         {
-            if (shouldDisable)
+            if (_autoPanningTimer != null)
             {
-                _autoPanningTimer?.Stop();
+                _autoPanningTimer.Stop();
+                _autoPanningTimer.Tick -= HandleAutoPanning;
+                _autoPanningTimer = null;
             }
-            else if (_autoPanningTimer == null)
+            if (!shouldDisable && !DisablePanning && TopLevel.GetTopLevel(this) != null && ItemsHost != null)
             {
-                _autoPanningTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(AutoPanningTickRate),
-                    DispatcherPriority.Background, HandleAutoPanning);
-            }
-            else
-            {
-                _autoPanningTimer.Interval = TimeSpan.FromMilliseconds(AutoPanningTickRate);
+                _autoPanningTimer = new DispatcherTimer(DispatcherPriority.Background)
+                {
+                    Interval = TimeSpan.FromMilliseconds(AutoPanningTickRate)
+                };
+                _autoPanningTimer.Tick += HandleAutoPanning;
                 _autoPanningTimer.Start();
             }
         }
@@ -1393,8 +1394,9 @@ namespace Nodify
                 oc.CollectionChanged -= OnSelectedItemsChanged;
             }
 
-            if (newValue is INotifyCollectionChanged nc)
+            if (TopLevel.GetTopLevel(this) != null && newValue is INotifyCollectionChanged nc)
             {
+                nc.CollectionChanged -= OnSelectedItemsChanged;
                 nc.CollectionChanged += OnSelectedItemsChanged;
             }
 

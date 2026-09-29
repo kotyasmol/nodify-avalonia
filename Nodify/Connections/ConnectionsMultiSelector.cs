@@ -59,8 +59,9 @@ namespace Nodify
                 oc.CollectionChanged -= OnSelectedItemsChanged;
             }
 
-            if (newValue is INotifyCollectionChanged nc)
+            if (TopLevel.GetTopLevel(this) != null && newValue is INotifyCollectionChanged nc)
             {
+                nc.CollectionChanged -= OnSelectedItemsChanged;
                 nc.CollectionChanged += OnSelectedItemsChanged;
             }
 
