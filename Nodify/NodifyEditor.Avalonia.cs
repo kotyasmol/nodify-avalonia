@@ -13,6 +13,24 @@ public partial class NodifyEditor
             PseudoClasses.Set(":connections-on-top", DisplayConnectionsOnTop);
     }
 
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        OnSelectedItemsSourceChanged(null!, SelectedItems!);
+        OnDisableAutoPanningChanged(DisableAutoPanning);
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        OnDisableAutoPanningChanged(true);
+        if (SelectedItems is System.Collections.Specialized.INotifyCollectionChanged selected)
+            selected.CollectionChanged -= OnSelectedItemsChanged;
+        bringToViewToken?.Cancel();
+        bringToViewToken?.Dispose();
+        bringToViewToken = null;
+        base.OnDetachedFromVisualTree(e);
+    }
+
     private bool inOnSelectedItemsChanged;
 
     /// <summary>

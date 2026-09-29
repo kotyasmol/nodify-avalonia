@@ -6,6 +6,8 @@ namespace Nodify;
 public partial class BaseConnection
 {
     private CancellationTokenSource? animationTokenSource;
+    private double? _animationDuration;
+    private bool _isAttached;
     private FormattedText? _formattedText;
     private CultureInfo? _textCulture;
 
@@ -30,6 +32,38 @@ public partial class BaseConnection
             change.Property == ForegroundProperty || change.Property == StrokeProperty ||
             change.Property == FlowDirectionProperty)
             _formattedText = null;
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        _isAttached = true;
+        UpdateAnimation();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        _isAttached = false;
+        PauseAnimation();
+        _container = null;
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void UpdateAnimation()
+    {
+        PauseAnimation();
+        if (_animationDuration is { } duration && _isAttached)
+        {
+            animationTokenSource = new();
+            this.StartLoopingAnimation(DirectionalArrowsOffsetProperty, DirectionalArrowsOffset + 1d, duration, animationTokenSource.Token);
+        }
+    }
+
+    private void PauseAnimation()
+    {
+        this.CancelAnimation(DirectionalArrowsOffsetProperty, animationTokenSource);
+        animationTokenSource?.Dispose();
+        animationTokenSource = null;
     }
 
     static BaseConnection()

@@ -234,7 +234,35 @@ namespace Nodify
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
             base.OnApplyTemplate(e);
+            HookEditor();
+        }
 
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            HookEditor();
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            UnhookEditor();
+            base.OnDetachedFromVisualTree(e);
+        }
+
+        private void UnhookEditor()
+        {
+            if (Editor != null)
+            {
+                Editor.RemoveHandler(Connector.PendingConnectionStartedEvent, new PendingConnectionEventHandler(OnPendingConnectionStarted));
+                Editor.RemoveHandler(Connector.PendingConnectionDragEvent, new PendingConnectionEventHandler(OnPendingConnectionDrag));
+                Editor.RemoveHandler(Connector.PendingConnectionCompletedEvent, new PendingConnectionEventHandler(OnPendingConnectionCompleted));
+                Editor = null;
+            }
+        }
+
+        private void HookEditor()
+        {
+            UnhookEditor();
             Editor = this.GetParentOfType<NodifyEditor>();
 
             if (Editor != null)

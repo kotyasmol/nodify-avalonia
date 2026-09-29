@@ -756,15 +756,15 @@ namespace Nodify
         /// <param name="duration">The duration for moving an arrowhead from <see cref="Source"/> to <see cref="Target"/>.</param>
         public void StartAnimation(double duration = 1.5d)
         {
-            StopAnimation();
-            animationTokenSource = new();
-            this.StartLoopingAnimation(DirectionalArrowsOffsetProperty, DirectionalArrowsOffset + 1d, duration, animationTokenSource.Token);
+            _animationDuration = duration;
+            UpdateAnimation();
         }
 
         /// <summary>Stops the animation started by <see cref="StartAnimation(double)"/></summary>
         public void StopAnimation()
         {
-            this.CancelAnimation(DirectionalArrowsOffsetProperty, animationTokenSource);
+            _animationDuration = null;
+            PauseAnimation();
         }
 
         protected override void OnPointerPressed(PointerPressedEventArgs e)
