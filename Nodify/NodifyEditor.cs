@@ -1355,7 +1355,10 @@ namespace Nodify
 
         /// <inheritdoc />
         protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
-            => PopAllStates();
+        {
+            CancelActiveCutting();
+            PopAllStates();
+        }
 
         /// <inheritdoc />
         protected override void OnPointerWheelChanged(PointerWheelEventArgs e)

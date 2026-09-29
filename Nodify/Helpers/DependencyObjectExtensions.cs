@@ -75,26 +75,26 @@ namespace Nodify
         public static List<FrameworkElement> GetIntersectingElements(this UIElement container, Geometry geometry, IReadOnlyCollection<Type> supportedTypes)
         {
             var result = new List<FrameworkElement>();
-            VisualTreeHelper.HitTest(container, depObj =>
-            {
-                if (depObj is FrameworkElement elem && elem.IsHitTestVisible)
-                {
-                    if (supportedTypes.Contains(elem.GetType()))
-                    {
-                        return HitTestFilterBehavior.ContinueSkipChildren;
-                    }
+            if (geometry is not LineGeometry line || line.StartPoint == line.EndPoint)
+                return result;
 
-                    return HitTestFilterBehavior.ContinueSkipSelf;
-                }
-
-                return HitTestFilterBehavior.ContinueSkipSelfAndChildren;
-            }, hitResult =>
-            {
-                result.Add((FrameworkElement)hitResult.VisualHit);
-                return HitTestResultBehavior.Continue;
-            }, new GeometryHitTestParameters(geometry));
-
+            Visit(container);
             return result;
+
+            void Visit(Visual visual)
+            {
+                if (visual is Control { IsVisible: false } || visual is InputElement { IsHitTestVisible: false })
+                    return;
+
+                if (visual is Control control && supportedTypes.Contains(control.GetType()))
+                {
+                    if (ConnectionHitTest.Intersects(control, container, line.StartPoint, line.EndPoint))
+                        result.Add(control);
+                    return;
+                }
+                foreach (var child in visual.GetVisualChildren())
+                    Visit(child);
+            }
         }
 
         #region Animation

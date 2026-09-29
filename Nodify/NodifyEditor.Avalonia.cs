@@ -28,7 +28,18 @@ public partial class NodifyEditor
         bringToViewToken?.Cancel();
         bringToViewToken?.Dispose();
         bringToViewToken = null;
+        CancelActiveCutting();
+        PopAllStates();
         base.OnDetachedFromVisualTree(e);
+    }
+
+    private void CancelActiveCutting()
+    {
+        foreach (var state in _states)
+        {
+            if (state is EditorCuttingState cutting)
+                cutting.Canceled = true;
+        }
     }
 
     private bool inOnSelectedItemsChanged;

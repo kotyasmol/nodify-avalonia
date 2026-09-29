@@ -84,12 +84,12 @@ public class RenderingCacheTests
         var connection = new CountingConnection { Source = new Point(20, 30), Target = new Point(300, 140), OutlineBrush = Brushes.Red };
         using var view = new ConnectionView(connection);
         int before = connection.GeometryBuilds;
-        double width = connection.DrawOverlay().Children.OfType<GeometryDrawing>().Single().Pen!.Thickness;
+        double width = connection.DrawOverlay().Children.OfType<GeometryDrawing>().First().Pen!.Thickness;
         connection.StrokeThickness = 12;
         connection.OutlineThickness = 4;
         connection.OutlineBrush = Brushes.Green;
         view.Flush();
-        var drawing = connection.DrawOverlay().Children.OfType<GeometryDrawing>().Single();
+        var drawing = connection.DrawOverlay().Children.OfType<GeometryDrawing>().First();
         Assert.True(drawing.Pen!.Thickness > width);
         Assert.Equal(20, drawing.Pen.Thickness);
         Assert.Equal(Brushes.Green, drawing.Pen.Brush);

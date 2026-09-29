@@ -832,6 +832,7 @@ namespace Nodify
                 e.Pointer.Capture(null);
                 this.PropagateMouseCapturedWithin(false);
             }
+            base.OnPointerReleased(e);
         }
         
         private Pen GetOutlinePen()

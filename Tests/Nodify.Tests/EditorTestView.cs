@@ -7,7 +7,7 @@ namespace Nodify.Tests;
 
 internal sealed class EditorTestView : IDisposable
 {
-    public NodifyEditor Editor { get; } = new();
+    public TestEditor Editor { get; } = new();
     public Window Window { get; }
 
     public EditorTestView(params BaseConnection[] connections)
@@ -32,5 +32,14 @@ internal sealed class EditorTestView : IDisposable
     {
         Window.Close();
         Dispatcher.UIThread.RunJobs();
+    }
+}
+
+internal sealed class TestEditor : NodifyEditor
+{
+    public void Cut(Point start, Point end)
+    {
+        StartCutting(start);
+        EndCutting(end);
     }
 }
